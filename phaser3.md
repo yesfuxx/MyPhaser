@@ -60,6 +60,13 @@ for (var i = 0; i < keys.length; i++){
 var colors = [ 0xef658c, 0xff9a52, 0xffdf00, 0x31ef8c, 0x21dfff, 0x31aade, 0x5275de, 0x9c55ad, 0xbd208c ];
 //get an random item form Array
 Phaser.Utils.Array.GetRandom(colors)
+
+//深度
+sprite.setDepth(y);
+
+//设置颜色
+const colors = [ 0xef658c, 0xff9a52, 0xffdf00, 0x31ef8c, 0x21dfff, 0x31aade, 0x5275de, 0x9c55ad, 0xbd208c ];
+const sprite1 = this.add.sprite(200, 300, 'cube').setTint(colors[0]);
 ```
 
 
@@ -654,5 +661,215 @@ this.add.sprite(600, 300, 'boom').play('explode3');
 
 /////////////
 sprite.anims.getName()==='idle'
+
+
+
+
+
+
+```
+
+
+
+```
+this.anims.create({ key: 'walk', frames: this.anims.generateFrameNames('zombie', { prefix: 'walk_', end: 8, zeroPad: 3 }), repeat: -1, frameRate: 8 });
+```
+
+
+
+#### 播放
+
+```
+this.rob = this.add.sprite(400, 560, 'zombie').setOrigin(0.5, 1).play('walk');
+this.rob.anims.playAfterDelay('death', 2000);
+this.rob.anims.playAfterRepeat('turn');
+
+//  When the current animation repeat ends, we'll play the 'turn' animation
+ripley.anims.playAfterRepeat('turn');
+//  And after that, the 'walk' look
+ripley.anims.chain('walk');
+
+/////////////////
+//  Our global 'spin' animation
+this.anims.create({
+    key: 'spin',
+    frames: this.anims.generateFrameNames('cube', { prefix: 'frame', start: 1, end: 23 }),
+    frameRate: 50,
+    repeat: -1
+});
+//  Play the 'spin' animation
+sprite1.play({ key: 'spin' });
+//  Play the animation and override the default frameRate with a new one
+sprite2.play({ key: 'spin', frameRate: 20 });
+//  Play the animation and set the repeatDelay to 250ms
+sprite3.play({ key: 'spin', repeatDelay: 250 });
+```
+
+
+
+
+
+#### 事件
+
+```
+// Event handler for when the animation completes on our sprite
+ANIMATION_COMPLETE//动画播放完成
+ANIMATION_REPEAT//动画重复
+ANIMATION_START
+ANIMATION_STOP
+ANIMATION_UPDATE
+sprite.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function () {
+    this.releaseItem();
+}, this);
+sprite.on(Phaser.Animations.Events.ANIMATION_UPDATE, function (anim, frame, sprite, frameKey) {
+    //  We can run our effect when we get frame0004:
+    if (frameKey === 'attack_B/frame0004')
+   		this.releaseItem();
+}, this);
+```
+
+
+
+
+
+#### 暂停和恢复
+
+```
+
+this.input.on('pointerdown', function () {
+//  Every single animation in the Animation Manager will be paused:
+    if (this.anims.paused)
+        this.anims.resumeAll();
+    else
+        this.anims.pauseAll();
+}, this);
+/////////////////////////////////////////////
+const square = this.anims.create({ key: 'square', frames: this.anims.generateFrameNames('gems', { prefix: 'square_', end: 14, zeroPad: 4 }), repeat: -1 });
+//  square added twice just to make sure there are more of them
+const keys = [ 'diamond', 'prism', 'ruby', 'square', 'square' ];
+let x = 100;
+let y = 116;
+for (let i = 0; i < 8; i++){
+	this.add.sprite(x, y, 'gems').play(keys[Phaser.Math.Between(0, 4)]);
+}
+this.input.on('pointerdown', function () {
+//  Every sprite using the global 'square' animation will now pause,
+//  because we're pausing the Animation instance itself:
+if (square.paused)
+	square.resume();
+else
+	square.pause();
+```
+
+
+
+#### 移除
+
+```
+ const square = this.anims.create({ key: 'square', frames: this.anims.generateFrameNames('gems', { prefix: 'square_', end: 14, zeroPad: 4 }), repeat: -1 });
+this.add.sprite(x, y, 'gems').play('square');
+//  We'll now remove the square animation from the global Animation Manager
+this.anims.remove('square');
+```
+
+
+
+
+
+
+
+```
+this.tweens.add({
+    targets: item,
+    props: {
+        y: {
+            value: -64,
+            ease: 'Linear',
+            duration: 3000,
+        },
+        x: {
+            value: '+=128',
+            ease: 'Sine.inOut',
+            duration: 500,
+            yoyo: true,
+            repeat: 4
+           }
+    },
+    onComplete: function () {
+    	item.destroy();
+    }
+});
+```
+
+
+
+
+
+### tilesprite
+
+
+
+```
+this.bg = this.add.tileSprite(0, 16, 800, 600, 'bg').setOrigin(0);
+this.ground = this.add.tileSprite(0, 536, 800, 64, 'tiles', 1).setOrigin(0);
+update (){
+    this.bg.tilePositionX += 4;
+    this.ground.tilePositionX += 8;
+}
+```
+
+
+
+
+
+### keyboard
+
+```
+this.input.keyboard.on('keydown-SPACE', function (event) {
+this.sprite.play('walk');
+}, this);
+
+this.input.keyboard.on('keydown-Y', function (event) {
+this.sprite.anims.yoyo = !this.sprite.anims.yoyo;
+}, this);
+
+this.input.keyboard.on('keydown-Q', function (event) {
+		this.sprite.playReverse('walk');
+}, this);
+
+this.input.keyboard.on('keydown-R', function (event) {
+this.sprite.anims.reverse();
+}, this);
+```
+
+
+
+
+
+### Group
+
+```
+const group = this.add.group();
+group.createMultiple({ key: 'diamonds', frame: 0, repeat: 279 });
+Phaser.Actions.GridAlign(group.getChildren(), { width: 20, height: 20, cellWidth: 38, x: 38, y: 50 });
+this.anims.staggerPlay('flash', group.getChildren(), 60);
+
+```
+
+
+
+### tweens
+
+```
+this.tweens.add({
+    targets: this.lancelot.anims,
+    timeScale: { from: 0.5, to: 2 },
+    ease: 'Sine.inOut',
+    yoyo: true,
+    repeat: -1,
+    repeatDelay: 1000,
+    hold: 1000,
+    duraton: 3000
+});
 ```
 
