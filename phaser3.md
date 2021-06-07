@@ -873,3 +873,376 @@ this.tweens.add({
 });
 ```
 
+### Action
+
+```
+const group = this.add.group({
+    key: 'diamonds',
+    frame: [ 0, 1, 2, 3, 4 ],
+    frameQuantity: 20  //每帧的个数
+});
+Phaser.Actions.GridAlign(group.getChildren(), {
+    width: 10,	//宽多少个
+    height: 10,	//高多少个
+    cellWidth: 32,
+    cellHeight: 32,
+    x: 100,
+    y: 100
+});
+
+//////////////
+this.groupA.create(100 + Math.random() * 600, 100 + Math.random() * 400, 'atlas', 'veg0' + Math.floor(1 + Math.random() * 9));
+
+//////
+Phaser.Actions.IncX(this.groupA.getChildren(), Math.cos(this.move));
+Phaser.Actions.IncY(this.groupA.getChildren(), Math.sin(this.move));
+Phaser.Actions.Rotate(this.groupA.getChildren(), -0.01);
+
+
+//////////
+const circle = new Phaser.Geom.Circle(400, 300, 220);//x,y,r
+this.group = this.add.group({
+	key: 'balls', 
+	frame: [0, 1, 5], 
+	repeat: 10//每帧个数
+});
+Phaser.Actions.PlaceOnCircle(this.group.getChildren(), circle);//放置到圆
+this.tween = this.tweens.addCounter({
+    from: 220,
+    to: 100,
+    duration: 3000,
+    delay: 2000,
+    ease: 'Sine.easeInOut',
+    repeat: -1,
+    yoyo: true
+});
+update ()
+{
+Phaser.Actions.RotateAroundDistance(this.group.getChildren(), { x: 400, y: 300 }, 0.02, this.tween.getValue());
+}
+
+//////////////
+create (){
+    this.group1 = this.add.group({ key: 'ball', frameQuantity: 36 });
+    this.circle1 = new Phaser.Geom.Circle(400, 300, 200);
+    Phaser.Actions.PlaceOnCircle(this.group1.getChildren(), this.circle1);
+}
+update (){
+	Phaser.Actions.RotateAroundDistance(this.group1.getChildren(), this.circle1, -0.030, this.circle1.radius);
+}
+
+
+
+```
+
+
+
+#### Place On ellipse（在线上）
+
+```
+///////////////////
+his.ellipse = new Phaser.Geom.Ellipse(400, 300, 200, 500);x,y,w,h
+this.group = this.add.group({ key: 'ball', frameQuantity: 48 });
+Phaser.Actions.PlaceOnEllipse(this.group.getChildren(), this.ellipse);//放置到椭圆
+this.tweens.add({
+    targets: this.ellipse,
+    width: 700,
+    height: 100,
+    delay: 1000,
+    duration: 2000,
+    ease: 'Sine.easeInOut',
+    repeat: -1,
+    yoyo: true
+});
+update (){
+	Phaser.Actions.PlaceOnEllipse(this.group.getChildren(), this.ellipse);
+}
+```
+
+#### Place On Line
+
+```
+const line = new Phaser.Geom.Line(100, 200, 600, 400);x1,y1,x2,y2
+const group = this.add.group({ key: 'ball', frameQuantity: 32 });
+Phaser.Actions.PlaceOnLine(group.getChildren(), line);
+```
+
+#### Place On Rectangle
+
+```
+const rect = new Phaser.Geom.Rectangle(100, 100, 256, 256);//x,y,w,h
+const group = this.add.group({ key: 'ball', frameQuantity: 32 });
+Phaser.Actions.PlaceOnRectangle(group.getChildren(), rect);
+```
+
+#### Place On Rectangle Shift
+
+```
+create (){
+    this.rect = new Phaser.Geom.Rectangle(64, 32, 100, 512);
+    this.group = this.add.group({ key: 'balls', frame: [0,1,2,3,4,5], frameQuantity: 10 });
+    this.tweens.add({
+    targets: this.rect,
+    x: 200,
+    y: 200,
+    width: 512,
+    height: 100,
+    delay: 2000,
+    duration: 3000,
+    ease: 'Sine.easeInOut',
+    repeat: -1,
+    yoyo: true
+    });
+}
+update (){
+    Phaser.Actions.PlaceOnRectangle(this.group.getChildren(), this.rect, this.i);//shiftnumber positional offset
+    this.i++;
+    if (this.i === this.group.length)
+        this.i = 0;
+}
+```
+
+#### Random（面上）
+
+```
+this.load.image('orb', 'assets/sprites/orb-blue.png');
+//  Create 300 sprites (they all start life at 0x0)
+const group = this.add.group({ key: 'orb', frameQuantity: 300 });
+const circle = new Phaser.Geom.Circle(400, 300, 130);
+
+//  Randomly position the sprites within the circle
+Phaser.Actions.RandomCircle(group.getChildren(), circle);//圆
+Phaser.Actions.RandomEllipse(group.getChildren(), this.ellipse);椭圆
+Phaser.Actions.RandomLine(group.getChildren(), line);//
+Phaser.Actions.RandomRectangle(group.getChildren(), rect);//
+Phaser.Actions.RandomTriangle(group.getChildren(), triangle);//
+```
+
+#### Rotate Around
+
+```
+this.load.spritesheet('diamonds', 'assets/sprites/diamonds32x24x5.png', { frameWidth: 32, frameHeight: 24 });
+this.group = this.add.group();
+for (var i = 0; i < 256; i++){
+this.group.create(Phaser.Math.Between(200, 600), Phaser.Math.Between(100, 500), 'diamonds', Phaser.Math.Between(0, 4));
+}
+update (){
+	Phaser.Actions.RotateAround(this.group.getChildren(), { x: 400, y: 300 }, 0.01);
+}
+```
+
+#### Rotate Around Distance
+
+```
+this.group = this.add.group();
+for (let i = 0; i < 32; i++){
+	this.group.create(i * 32, i * 2, 'ball');
+}
+update (){
+	Phaser.Actions.RotateAroundDistance(this.group.getChildren(), { x: 400, y: 300 }, 0.02, 200);
+}
+```
+
+#### Rotate Around X Y
+
+```
+create ()
+{
+	this.group = this.add.group();
+    for (var i = 0; i < 256; i++)    {	
+    		this.group.create(Phaser.Math.Between(200, 600), Phaser.Math.Between(100, 500), 'diamonds', 			  	Phaser.Math.Between(0, 4));
+    }
+    this.geomPoint = new Phaser.Geom.Point(400, 300);
+    this.input.on('pointermove', function (pointer) {
+    	this.geomPoint.setTo(pointer.x, pointer.y);
+    }, this);
+}
+update (){
+	Phaser.Actions.RotateAroundDistance(this.group.getChildren(), this.geomPoint, 0.1, 100);
+}
+```
+
+#### Rotate Container Facing Point
+
+```
+class Example extends Phaser.Scene{
+    constructor ()    {
+        super();
+        this.container;
+        this.center = {x: 400, y: 300}
+        this.rotateSpeed = 0.02
+    }
+    preload ()    {
+        this.load.spritesheet('diamonds', 'assets/sprites/diamonds32x24x5.png', { frameWidth: 32, frameHeight: 24 });
+    }
+    create ()    {
+        this.add.sprite(this.center.x, this.center.y, 'diamonds', 1); // center point. We will rotate around it
+
+        this.container = this.add.container(600, 300);
+
+        const text = this.add.text(-25, -50, 'Phaser');
+
+        const diamond1 = this.add.sprite(0, 0, 'diamonds', 1);
+        diamond1.setScale(2)
+
+        const diamond2 = this.add.sprite(15, 0, 'diamonds', 2);
+        diamond2.setScale(2)
+
+        const diamond3 = this.add.sprite(-15, 0, 'diamonds', 3);
+        diamond3.setScale(2)
+
+        this.container.add([diamond1, diamond2, diamond3, text])
+
+        // stop rotation on click
+        this.input.on('pointerdown', function() {
+          if (this.rotateSpeed > 0) {
+              this.rotateSpeed = 0
+          } else {
+              this.rotateSpeed = 0.02
+          }
+        }, this);
+    }
+
+    update ()    {
+        Phaser.Actions.RotateAroundDistance([this.container], this.center, this.rotateSpeed, 250);
+        //面向旋转中心
+        const angleDeg = Math.atan2(this.container.y - this.center.y, this.container.x - this.center.x) * 180 / Math.PI;
+        this.container.angle = angleDeg+90 // container should face the center point
+    }
+}
+```
+
+#### Set Alpha
+
+```
+const group = this.add.group({ key: 'diamonds', frame: 0, frameQuantity: 50, setXY: { x: 32, y: 32, stepX: 14 }});
+//SetAlpha(group.getChildren(), value, step)
+Phaser.Actions.SetAlpha(group.getChildren(), 0, 1 / 50);
+```
+
+#### Spread
+
+```
+const group = this.add.group({ key: 'diamonds', frame: 3, frameQuantity: 50, setXY: { x: 32, y: 32, stepX: 14 }});
+//  Spread out the children between the 2 given values, using the string-based property
+Phaser.Actions.Spread(group.getChildren(), 'alpha', 0, 1);
+```
+
+#### Set X Y
+
+```
+const group = this.add.group();
+//  Add an existing Image into the group:
+const image = this.add.image(0, 0, 'phaser');
+group.add(image);
+//  For example this will set the position of the image to 400 x 300
+Phaser.Actions.SetXY(group.getChildren(), 400, 300);
+```
+
+#### Shift Position
+
+```
+class Example extends Phaser.Scene
+{
+    constructor ()    {
+        super();
+        this.move = 0;
+        this.x = 0;
+        this.y = 0;
+    }
+    preload ()    {
+        this.load.image('sky', 'assets/skies/deepblue.png');
+        this.load.image('ball', 'assets/demoscene/ball-tlb.png');
+    }
+    create ()    {
+        this.add.image(0, 0, 'sky').setOrigin(0);
+        this.group = this.add.group({ key: 'ball', frameQuantity: 128 });
+        
+        this.input.on('pointermove', function (pointer) {
+            this.x = pointer.x;
+            this.y = pointer.y;
+        }, this);
+    }
+    update (time, delta)	{
+        this.move += delta;
+        if (this.move > 6)        {
+            Phaser.Actions.ShiftPosition(this.group.getChildren(), this.x, this.y);
+            this.move = 0;
+        }
+    }
+}
+```
+
+#### Wrap In Camera Bounds
+
+```
+class Example extends Phaser.Scene
+{
+    constructor ()    {
+        super();
+    }
+
+    create ()    {
+        this.graphics = this.add.graphics();
+
+        this.shapes = new Array(15).fill(null).map(
+            () => new Phaser.Geom.Circle(Phaser.Math.Between(0, 800), Phaser.Math.Between(0, 600), Phaser.Math.Between(25, 75))
+        );
+
+        this.rect = Phaser.Geom.Rectangle.Clone(this.cameras.main);
+    }
+
+    update ()    {
+        this.shapes.forEach(function (shape, i) {
+            shape.x += (1 + 0.1 * i);
+            shape.y += (1 + 0.1 * i);
+        });
+
+        Phaser.Actions.WrapInRectangle(this.shapes, this.rect, 72);
+
+        this.draw();
+    }
+
+    // Locals methods, they are not part of Phaser.scene
+    color (i)    {
+        return 0x001100 * (i % 15) + 0x000033 * (i % 5);
+    }
+
+    draw ()    {
+        this.graphics.clear();
+
+        this.shapes.forEach((shape, i) => {
+            this.graphics
+            .fillStyle(this.color(i), 0.5)
+            .fillCircleShape(shape);
+        }, this);
+    }
+}
+```
+
+#### Wrap In Rectangle
+
+```
+class Example extends Phaser.Scene
+{
+    constructor ()    {
+        super();
+    }
+    preload ()    {
+        this.load.image('ball', 'assets/sprites/shinyball.png');
+    }
+    create ()    {
+        this.rect = new Phaser.Geom.Rectangle(100, 100, 256, 256);
+        this.group = this.add.group({ key: 'ball', frameQuantity: 32 });
+
+        Phaser.Actions.RandomRectangle(this.group.getChildren(), this.rect);
+    }
+    update ()    {
+        this.children = this.group.getChildren();
+	    //IncXY(group.getChildren)  x,y 增量
+        Phaser.Actions.IncXY(this.children, 1, 1);
+        Phaser.Actions.WrapInRectangle(this.children, this.rect);
+    }
+}
+```
+
